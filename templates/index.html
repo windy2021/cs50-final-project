@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Menu
+{% endblock %}
+
+{% block main %}
+
+<div class="card" id="shoppingCart">
+  <div class="card-header">
+    Featured
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Special title treatment</h5>
+    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</div>
+
+{% if data %}
+<div class="container">
+    <div class="row">
+    {% for dt in data %}
+<div class="col">
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="static/{{dt.img_url}}" alt="{{dt.name}}">
+        <div class="card-body">
+            <h5 class="card-title">{{dt.name}}</h5>
+            <p>{{dt.price | usd}}</p>
+            <p class="card-text">{{dt.description}}</p>
+            <a class="btn btn-primary" onclick="addToCart(event)">Add To Cart</a>
+        </div>
+    </div>
+</div>
+    {% endfor %}
+    {% else %}
+        <p colspan="5">
+            No products to show...
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
