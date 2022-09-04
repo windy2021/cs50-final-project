@@ -1,15 +1,18 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_fontawesome import FontAwesome
 
 from helpers import apology, login_required, usd
 
 # Configure application
 app = Flask(__name__)
+
+fa = FontAwesome(app)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -33,14 +36,20 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
-
 @app.route("/")
 def index():
     products = db.execute("Select * from products;")
-    print(products)
     if products is not None:
         return render_template("index.html", data = products)
     return apology("test")
+
+@app.route("/add", methods=["GET","POST"])
+def add():
+    product_id = request.args.get("product_id")
+    if not request.args.get("product_id"):
+         return apology("something's wrong", 403)
+    row = db.execute("SELECT id, name, price, img_url FROM products WHERE id = ?", product_id)    
+    return jsonify(product_info = row)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

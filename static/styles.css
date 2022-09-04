@@ -63,7 +63,9 @@ tbody tr:nth-of-type(odd) {
     width: 20px;
 }
 
-#shoppingCart{
-    display: none; 
+#shopping_cart_window{
+    visibility: hidden;
     position: absolute;
+    z-index: 1;
+    background-color: #537fbe;
 }
