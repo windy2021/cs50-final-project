@@ -5,33 +5,6 @@ Menu
 {% endblock %}
 
 {% block main %}
-
-{% if data %}
-<div class="container">
-    <div class="row">
-      {% for dt in data %}
-      <div class="col">
-          <div class="card" style="width: 18rem;">
-              <img class="card-img-top" src="static/{{dt.img_url}}" alt="{{dt.name}}">
-              <div class="card-body">
-                  <h5 id="product_title" class="card-title">{{dt.name}}</h5>
-                  <p>{{dt.price | usd}}</p>
-                  <p class="card-text">{{dt.description}}</p>
-                  <button class="btn btn-primary" id="{{dt.id}}" onclick="addToCart(this.id)">Add</button>
-              </div>
-          </div>
-      </div>
-      {% endfor %}
-      {% else %}
-          <p>
-              No products to show...
-          </p>
-    </div>
-    {% endif %}
-</div>
-{% endblock %}
-
-
 <div class="container" id="shopping_cart_window"></div>
   {% if session["selected_products"]%}
   <div class="card rounded-3 mb-4">
@@ -71,3 +44,30 @@ Menu
   </div>
 {% endif %}
 </div>
+
+{% if data %}
+<div class="container">
+    <div class="row">
+      {% for dt in data %}
+      <div class="col">
+          <div class="card" style="width: 18rem;">
+              <img class="card-img-top" src="static/{{dt.img_url}}" alt="{{dt.name}}">
+              <div class="card-body">
+                  <h5 id="product_title" class="card-title">{{dt.name}}</h5>
+                  <p>{{dt.price | usd}}</p>
+                  <p class="card-text">{{dt.description}}</p>
+                  <button class="btn btn-primary" id="{{dt.id}}" onclick="addToCart(this.id)">Add</button>
+              </div>
+          </div>
+      </div>
+      {% endfor %}
+      {% else %}
+          <p>
+              No products to show...
+          </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
