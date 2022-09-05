@@ -1,3 +1,4 @@
+from crypt import methods
 import os
 
 from cs50 import SQL
@@ -28,6 +29,8 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///mylittlestore.db")
 
+cart_items = []
+
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
@@ -48,8 +51,14 @@ def add():
     product_id = request.args.get("product_id")
     if not request.args.get("product_id"):
          return apology("something's wrong", 403)
-    row = db.execute("SELECT id, name, price, img_url FROM products WHERE id = ?", product_id)    
+    row = db.execute("SELECT name, price, img_url FROM products WHERE id = ?", product_id)
+    cart_item = {"name": row[0]["name"], "price": row[0]["price"], "img_url": row[0]["img_url"]}
+    cart_items.append(cart_item)
     return jsonify(product_info = row)
+
+@app.route("/cart", methods=["GET"])
+def cart():
+    return render_template("cart.html", cart_items = cart_items, count = len(cart_items))
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

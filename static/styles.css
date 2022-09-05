@@ -62,10 +62,3 @@ tbody tr:nth-of-type(odd) {
 .fit-pic {
     width: 20px;
 }
-
-#shopping_cart_window{
-    visibility: hidden;
-    position: absolute;
-    z-index: 1;
-    background-color: #537fbe;
-}
