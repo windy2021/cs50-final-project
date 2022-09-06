@@ -23,15 +23,21 @@ Cart
         </div>
       </div>
       <div class="col-md-2 d-flex justify-content-center">
-        <div>
+        <div id="div_with_input">
           <p class="small text-muted mb-4 pb-2">Quantity</p>
-          <input class="text-black" min="0" name="quantity" value="1" type="number">
+          <input id="{{item.id}}" min="0" max="10" name="quantity" value="{{item.quantity}}" type="number" style="width: 45px;" onchange="onInputChangeInCart(this.id)">
         </div>
       </div>
       <div class="col-md-2 d-flex justify-content-center">
-        <div>
+        <div id="div_with_price">
           <p class="small text-muted mb-4 pb-2">Price</p>
-          <p class="lead fw-normal mb-0">{{item.price | usd}}</p>
+          <p id="{{item.id}}" class="lead fw-normal mb-0" name="price">{{item.price | usd}}</p>
+        </div>
+      </div>
+      <div class="col-md-2 d-flex justify-content-center">
+        <div id="div_with_subtotal">
+          <p class="small text-muted mb-4 pb-2">Subtotal</p>
+          <p class="lead fw-normal mb-0" name="subtotal">{{item.subtotal | usd}}</p>
         </div>
       </div>
     </div>

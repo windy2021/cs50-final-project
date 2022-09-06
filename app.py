@@ -1,4 +1,5 @@
 from crypt import methods
+from decimal import Decimal
 import os
 
 from cs50 import SQL
@@ -49,11 +50,19 @@ def index():
 @app.route("/add", methods=["GET","POST"])
 def add():
     product_id = request.args.get("product_id")
+    quantity = request.args.get("quantity")
+
     if not request.args.get("product_id"):
          return apology("something's wrong", 403)
-    row = db.execute("SELECT name, price, img_url FROM products WHERE id = ?", product_id)
-    cart_item = {"name": row[0]["name"], "price": row[0]["price"], "img_url": row[0]["img_url"]}
+
+    row = db.execute("SELECT id, name, price, img_url FROM products WHERE id = ?", product_id)
+
+    subtotal = int(quantity) * float(row[0]["price"])
+
+    cart_item = {"id": row[0]["id"], "name": row[0]["name"], "price": row[0]["price"], "img_url": row[0]["img_url"], "quantity": quantity, "subtotal" : subtotal}
+
     cart_items.append(cart_item)
+    
     return jsonify(product_info = row)
 
 @app.route("/cart", methods=["GET"])

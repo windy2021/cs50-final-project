@@ -14,10 +14,12 @@ Menu
           <div class="card" style="width: 18rem;">
               <img class="card-img-top" src="static/{{dt.img_url}}" alt="{{dt.name}}">
               <div class="card-body">
-                  <h5 id="product_title" class="card-title">{{dt.name}}</h5>
-                  <p>{{dt.price | usd}}</p>
-                  <p class="card-text">{{dt.description}}</p>
-                  <button class="btn btn-primary" id="{{dt.id}}" onclick="addToCart(this.id)">Add</button>
+                    <h5 id="product_title" class="card-title">{{dt.name}}</h5>
+                    <p>{{dt.price | usd}}</p>
+                    <p class="card-text">{{dt.description}}</p>
+                    <p class="small text-muted mb-4 pb-2">Quantity</p>
+                    <input id="{{dt.id}}" min="0" max="10" type="number" value="1" style="width: 45px;">
+                    <button class="btn btn-primary" id="{{dt.id}}" onclick="addToCart(this.id)">Add</button>
               </div>
           </div>
       </div>
