@@ -37,7 +37,7 @@ Cart
       <div class="col-md-2 d-flex justify-content-center">
         <div id="div_with_subtotal">
           <p class="small text-muted mb-4 pb-2">Subtotal</p>
-          <p class="lead fw-normal mb-0" name="subtotal">{{item.subtotal | usd}}</p>
+          <p id="{{item.id}}" class="lead fw-normal mb-0" name="subtotal">{{item.subtotal | usd}}</p>
         </div>
       </div>
     </div>
@@ -46,10 +46,10 @@ Cart
     {% endfor %}
     <div class="card mb-5">
       <div class="card-body p-4">
-        <div class="float-end">
+        <div id="div_with_grand_total" class="float-end">
           <p class="mb-0 me-5 d-flex align-items-center">
             <span class="small text-muted me-2">Order total:</span> 
-            <span class="lead fw-normal">$799</span>
+            <span class="lead fw-normal" name="grand_total">{{grand_total | usd}}</span>
           </p>
         </div>
       </div>

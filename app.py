@@ -57,17 +57,25 @@ def add():
 
     row = db.execute("SELECT id, name, price, img_url FROM products WHERE id = ?", product_id)
 
+    for x in cart_items:
+        if int(x["id"]) == int(product_id):
+            quantity = int(x["quantity"]) + int(quantity)
+            cart_items.remove(x)
+
     subtotal = int(quantity) * float(row[0]["price"])
 
     cart_item = {"id": row[0]["id"], "name": row[0]["name"], "price": row[0]["price"], "img_url": row[0]["img_url"], "quantity": quantity, "subtotal" : subtotal}
 
     cart_items.append(cart_item)
     
-    return jsonify(product_info = row)
+    return jsonify(cart_items = cart_items, quantity = quantity, subtotal = subtotal)
 
 @app.route("/cart", methods=["GET"])
 def cart():
-    return render_template("cart.html", cart_items = cart_items, count = len(cart_items))
+    grand_total = 0
+    for item in cart_items:
+        grand_total = grand_total + float(item["subtotal"])
+    return render_template("cart.html", cart_items = cart_items, count = len(cart_items), grand_total = grand_total)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
