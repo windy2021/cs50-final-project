@@ -51,6 +51,7 @@ def index():
 def add():
     product_id = request.args.get("product_id")
     quantity = request.args.get("quantity")
+    flag = request.args.get("flag")
 
     if not request.args.get("product_id"):
          return apology("something's wrong", 403)
@@ -59,7 +60,8 @@ def add():
 
     for x in cart_items:
         if int(x["id"]) == int(product_id):
-            quantity = int(x["quantity"]) + int(quantity)
+            if flag != "from_cart":
+                quantity = int(x["quantity"]) + int(quantity)
             cart_items.remove(x)
 
     subtotal = int(quantity) * float(row[0]["price"])
