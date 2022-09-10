@@ -5,7 +5,6 @@ Menu
 {% endblock %}
 
 {% block main %}
- 
 {% if data %}
 <div class="container">
     <div class="row">
@@ -18,7 +17,7 @@ Menu
                     <p>{{dt.price | usd}}</p>
                     <p class="card-text">{{dt.description}}</p>
                     <p class="small text-muted mb-4 pb-2">Quantity</p>
-                    <input id="{{dt.id}}" min="0" max="10" type="number" value="1" style="width: 45px;">
+                    <input class="input-general" id="{{dt.id}}" min="0" max="10" type="number" value="1" style="width: 45px;">
                     <button class="btn btn-primary" id="{{dt.id}}" onclick="addToCart(this.id)">Add</button>
               </div>
           </div>

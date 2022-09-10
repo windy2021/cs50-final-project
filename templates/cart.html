@@ -27,64 +27,145 @@ Cart
 </div>
 
 {% if cart_items %}
-<div class="container" style="background-color: indianred;">
+<div class="container" style="background-color: indianred; padding-bottom: 10px;">
     <p><span class="h2">Shopping Cart </span><span class="h4">({{count}} item in your cart)</span></p>
   {% for item in cart_items %}
     <div class="card mb-4">
       <div class="card-body p-4">
-    <div class="row align-items-center" >
-      <div class="col-md-2">
-        <img src="static/{{item.img_url}}"
-          class="img-fluid" alt="{{item.name}}" style="height: 100px;">
-      </div>
-      <div class="col-md-2 d-flex justify-content-center">
-        <div>
-          <p class="small text-muted mb-4 pb-2">Name</p>
-          <p class="lead fw-normal mb-0">{{item.name}}</p>
-        </div>
-      </div>
-      <div class="col-md-2 d-flex justify-content-center">
-        <div id="div_with_input">
-          <p class="small text-muted mb-4 pb-2">Quantity</p>
-          <input id="{{item.id}}" min="0" max="10" name="quantity" value="{{item.quantity}}" type="number" style="width: 45px;" onchange="onInputChangeInCart(this.id)">
-        </div>
-      </div>
-      <div class="col-md-2 d-flex justify-content-center">
-        <div id="div_with_price">
-          <p class="small text-muted mb-4 pb-2">Price</p>
-          <p id="{{item.id}}" class="lead fw-normal mb-0" name="price">{{item.price | usd}}</p>
-        </div>
-      </div>
-      <div class="col-md-2 d-flex justify-content-center">
-        <div id="div_with_subtotal">
-          <p class="small text-muted mb-4 pb-2">Subtotal</p>
-          <p id="{{item.id}}" class="lead fw-normal mb-0" name="subtotal">{{item.subtotal | usd}}</p>
-        </div>
-      </div>
-    </div>
-    </div>
-    </div>
+        <div class="row align-items-baseline" >
+
+          <div class="col-md-2">
+            <img src="static/{{item.img_url}}"
+              class="img-fluid" alt="{{item.name}}" style="height: 100px;">
+          </div>
+
+          <div class="col-md-2 d-flex justify-content-center">
+            <div>
+              <p class="small text-muted mb-4 pb-2">Name</p>
+              <p class="lead fw-normal mb-0">{{item.name}}</p>
+            </div>
+          </div>
+
+          <div class="col-md-2 d-flex justify-content-center">
+            <div id="div_with_input">
+              <p class="small text-muted mb-4 pb-2">Quantity</p>
+              <input id="{{item.id}}" min="0" max="10" name="quantity" value="{{item.quantity}}" type="number" class="input-general" style="width: 45px;" onchange="onInputChangeInCart(this.id)">
+            </div>
+          </div>
+
+          <div class="col-md-2 d-flex justify-content-center">
+            <div id="div_with_price">
+              <p class="small text-muted mb-4 pb-2">Price</p>
+              <p id="{{item.id}}" class="lead fw-normal mb-0" name="price">{{item.price | usd}}</p>
+            </div>
+          </div>
+
+          <div class="col-md-2 d-flex justify-content-center">
+            <div id="div_with_subtotal">
+              <p class="small text-muted mb-4 pb-2">Subtotal</p>
+              <p id="{{item.id}}" class="lead fw-normal mb-0" name="subtotal">{{item.subtotal | usd}}</p>
+            </div>
+          </div>
+
+        </div> <!-- END OF ROW -->
+    </div> <!-- END OF CARD BODY -->
+  </div> <!-- END OF CARD -->
+
     {% endfor %}
     <div class="card mb-5">
       <div class="card-body p-4">
         <div id="div_with_grand_total" class="float-end">
           <p class="mb-0 me-5 d-flex align-items-center">
-            <span class="small text-muted me-2">Order total:</span> 
+            <span class="me-2"><strong>Order total:</strong></span> 
             <span class="lead fw-normal" name="grand_total">{{grand_total | usd}}</span>
           </p>
         </div>
       </div>
     </div>
-    <div class="d-flex justify-content-end">
-      <button type="button" class="btn btn-light btn-lg me-2">Continue shopping</button>
-      <button type="button" class="btn btn-primary btn-lg">Pay</button>
+
+    <div class="card mb-5">
+      <div class="card-body p-4">
+
+        <div class="row align-items-baseline justify-content-end" >
+			<div class="col-md-3 d-flex justify-content-end">
+					<p><strong>Select Delivery/Pickup time:</strong></p>
+			</div>
+
+			<div class="col-md-2 d-flex justify-content-center">
+				<div id="div_with_delivery_date">
+          <input id="date_picker" type="date" class="input-general" onclick="date_on_click()">
+				</div>
+			</div>
+
+			<div class="col-md-1 d-flex justify-content-center">
+				<div id="div_with_delivery_time">
+					<span>
+						<select id="delivery_times" class="form-select mx-auto w-auto" name="delivery_times"  onclick="get_available_times(this.value)">
+							<option selected="">Time</option>
+						</select>
+					</span>
+				</div>
+			</div>
+
+      <div class="col-md-2 d-flex justify-content-center">
+				<div id="div_with_delivery_method">
+					<span>
+						<select class="form-select mx-auto w-auto" name="delivery_method" aria-placeholder="select">
+							<option selected="">Delivery</option>
+							<option>Pickup</option>
+						</select>
+					</span>
+				</div>
+			</div>
+
+      <div class="col-md-4 d-flex justify-content-center">
+            <input type="text" name="address" placeholder="delivery address" style="width: -webkit-fill-available;" class="input-general">
+			</div>
+
+        </div> <!-- END OF ROW -->
+    </div> <!-- END OF CARD BODY -->
+  </div> <!-- END OF CARD -->
+
+  <div class="card mb-5">
+    <div class="card-body p-4">
+      <div class="row align-items-baseline justify-content-end" >
+
+    <div class="col-md-4 d-flex justify-content-end">
+        <p><strong>Enter card details:</strong></p>
     </div>
+
+    <div class="col-md-2 d-flex justify-content-center">
+      <div>
+        <span>
+          <select class="form-select mx-auto w-auto">
+            <option selected="">Visa</option>
+            <option>Master Card</option>
+            <option>Amex</option>
+          </select>
+        </span>
+      </div>
+    </div>
+
+      <div class="col-md-3 d-flex justify-content-center">
+            <input type="text" name="" placeholder="card number" style="width: -webkit-fill-available;" class="input-general">
+			</div>
+
+      <div class="col-md-3 d-flex justify-content-center">
+        <input type="text" name="" placeholder="name on card" style="width: -webkit-fill-available;" class="input-general">
   </div>
-  {% else %}
+      </div> <!-- END OF ROW -->
+  </div> <!-- END OF CARD BODY -->
+</div> <!-- END OF CARD -->
+
+    <div class="d-flex justify-content-end">
+      <a type="button" class="btn btn-light btn-lg me-2" href="/">Continue shopping</a>
+      <a type="button" class="btn btn-primary btn-lg">Pay</a>
+    </div>
+
+</div> <!-- END OF CONTAINER FOR CART -->
+{% else %}
   <p>
       Your shopping cart is empty...
   </p>
-</div>
 {% endif %}
-</div>
 {% endblock %}

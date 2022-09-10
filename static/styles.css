@@ -62,3 +62,9 @@ tbody tr:nth-of-type(odd) {
 .fit-pic {
     width: 20px;
 }
+
+.input-general{
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.380rem 0.375rem 0.75rem;
+}

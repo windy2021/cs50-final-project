@@ -75,9 +75,22 @@ def add():
 @app.route("/cart", methods=["GET"])
 def cart():
     grand_total = 0
-    for item in cart_items:
-        grand_total = grand_total + float(item["subtotal"])
-    return render_template("cart.html", cart_items = cart_items, count = len(cart_items), grand_total = grand_total)
+    if cart_items:
+        for item in cart_items:
+            grand_total = grand_total + float(item["subtotal"])
+        return render_template("cart.html", cart_items = cart_items, count = len(cart_items), grand_total = grand_total)
+    return render_template("cart.html")
+
+@app.route("/get_times", methods=["GET"])
+def get_times():
+    date_value = request.args.get("date_value")
+    available_times = db.execute("SELECT time FROM delivery_slots WHERE date = ? order by date asc", date_value)
+    return jsonify(available_times = available_times)
+
+@app.route("/get_dates", methods=["GET"])
+def get_dates():
+    available_dates = db.execute("SELECT DISTINCT date from delivery_slots")
+    return jsonify(available_dates = available_dates)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
