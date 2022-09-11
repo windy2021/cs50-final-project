@@ -1,5 +1,7 @@
 from crypt import methods
 from decimal import Decimal
+from email import message
+import json
 import os
 
 from cs50 import SQL
@@ -91,6 +93,66 @@ def get_times():
 def get_dates():
     available_dates = db.execute("SELECT DISTINCT date from delivery_slots")
     return jsonify(available_dates = available_dates)
+
+@app.route("/delete_from_cart", methods=["GET"])
+def delete_from_cart():
+    product_id = request.args.get("product_id")
+    if cart_items:
+        for x in cart_items:
+            if int(x["id"]) == int(product_id):
+                cart_items.remove(x)
+                break
+    return jsonify(cart_items = cart_items)
+
+@app.route("/pay", methods=["GET", "POST"])
+def pay():
+    # For Transactions Table
+    date = request.form.get("date")
+    time = str(request.form.get("time")) + ":00"
+    method = request.form.get("method")
+    address = request.form.get("address")
+    customer_id = None
+
+    # For New Customer in Customers
+    name = "GUEST"
+    user_id = None
+
+    if method == "PICKUP":
+        address = "PICKUP"
+    
+    if not address:
+        return jsonify({"message": "must provide delivery address"})
+
+    delivery_slot_row = db.execute("SELECT * from delivery_slots where date = ? and time = ? ", date, time)
+    if len(delivery_slot_row) == 0:
+        return jsonify({"message": "select another slot"})
+
+    if 'user' in session:
+        user_id = session['user_id']
+
+        get_username_query = db.execute("SELECT username FROM users WHERE id = ?", user_id)
+        name = get_username_query[0]["username"]
+
+        get_user_customer_id = db.execute("SELECT id FROM customers WHERE user_id = ?", user_id)
+        if len(get_user_customer_id) != 0:
+            customer_id = get_user_customer_id[0]["id"]
+
+    if customer_id is None:
+        customer_id = db.execute("INSERT INTO customers(name, customer_user_id) values(?, ?)", name, user_id)
+    
+    grand_total = 0
+    if cart_items:
+        for item in cart_items:
+            grand_total = grand_total + float(item["subtotal"])
+
+    insert_transaction_query = db.execute("INSERT INTO transactions(total, customer_id, delivery_slot_id, delivery_type, address) VALUES(?, ?, ?, ?, ?, ?)", grand_total, customer_id, delivery_slot_row[0]["id"], method, address)
+
+    for item in cart_items:
+        insert_transaction_details_query = db.execute("INSERT INTO transaction_details(transaction_id, product_id, quantity, subtotal) VALUES(?, ?, ?, ?)", insert_transaction_query, item['id'], item['quantity'], item['subtotal'])
+
+    delete_delivery_slot = db.execute("DELETE FROM delivery_slots WHERE id = ?", delivery_slot_row[0]["id"])
+     
+    return jsonify({"message": "Thank you for your order!"})
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

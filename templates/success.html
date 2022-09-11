@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Success
+{% endblock %}
+
+{% block main %}
+{% if data %}
+<div class="container">
+    <div class="row">
+      {% for dt in data %}
+      <p>{{dt.id}}</p>
+        <p>{{dt.name}}</p>
+        <p>{{dt.quantity}}</p>
+        <p>{{dt.subtotal}}</p>
+      {% endfor %}
+      <p>{{grand_total}}</p>
+      {% else %}
+          <p>
+              Nothing...
+          </p>
+    </div>
+{% endif %}
+</div>
+{% endblock %}
