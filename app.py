@@ -54,6 +54,8 @@ def index():
 def history():
     transactions = []
     get_customer_id = db.execute("select customers.id as customer_id from customers inner join users where customers.customer_user_id = users.id and users.id = ?", session["user_id"])
+    if len(get_customer_id) == 0:
+        return render_template("history.html")
     transactions_query_rows = db.execute("SELECT * FROM transactions where customer_id = ?", get_customer_id[0]["customer_id"])
     
     if transactions_query_rows is not None:
@@ -107,7 +109,6 @@ def cart():
     user_details ={
         "fullname": "",
         "email": "",
-        "address": "",
         "mobile": ""
     }
     grand_total = 0
@@ -118,7 +119,6 @@ def cart():
             user_details_row = db.execute("SELECT fullname, email, mobile, address FROM users WHERE id = ?", session["user_id"])
             user_details["fullname"] = user_details_row[0]["fullname"]
             user_details["email"] = user_details_row[0]["email"]
-            user_details["address"] = user_details_row[0]["address"]
             user_details["mobile"] = user_details_row[0]["mobile"]
         return render_template("cart.html", cart_items = cart_items, count = len(cart_items), grand_total = grand_total, user_details = user_details)
     return render_template("cart.html")
