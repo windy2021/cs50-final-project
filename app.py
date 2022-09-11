@@ -1,4 +1,5 @@
 from crypt import methods
+import datetime
 from decimal import Decimal
 from email import message
 import json
@@ -49,6 +50,33 @@ def index():
         return render_template("index.html", data = products)
     return apology("test")
 
+@app.route("/history")
+def history():
+    transactions = []
+    get_customer_id = db.execute("select customers.id as customer_id from customers inner join users where customers.customer_user_id = users.id and users.id = ?", session["user_id"])
+    transactions_query_rows = db.execute("SELECT * FROM transactions where customer_id = ?", get_customer_id[0]["customer_id"])
+    
+    if transactions_query_rows is not None:
+        now = datetime.datetime.now()
+        for transaction in transactions_query_rows:
+            transaction_details = db.execute("select product_id, quantity, subtotal from transaction_details where transaction_id = ?", transaction["id"])
+
+            status = "In progress"
+            # order_date = transaction["transaction_date_time"]
+            # datetime_object = datetime.datetime.strptime(order_date, '%Y-%m-%d %H:%M:%S')
+
+            delivery_datetime = str(transaction["delivery_date"]) + " " + str(transaction["delivery_time"])
+            datetime_object = datetime.datetime.strptime(delivery_datetime, '%Y-%m-%d %H:%M:%S')
+
+            if now > datetime_object:
+                status = "Completed"
+
+            transaction = {"id" : transaction["id"], "datetime": transaction["transaction_date_time"], "total": float(transaction["total"]), "status": status}
+
+            transactions.append(transaction)
+        return render_template("history.html", transactions = transactions)
+    return render_template("history.html")
+
 @app.route("/add", methods=["GET","POST"])
 def add():
     product_id = request.args.get("product_id")
@@ -76,11 +104,23 @@ def add():
 
 @app.route("/cart", methods=["GET"])
 def cart():
+    user_details ={
+        "fullname": "",
+        "email": "",
+        "address": "",
+        "mobile": ""
+    }
     grand_total = 0
-    if cart_items:
+    if len(cart_items) != 0:
         for item in cart_items:
             grand_total = grand_total + float(item["subtotal"])
-        return render_template("cart.html", cart_items = cart_items, count = len(cart_items), grand_total = grand_total)
+        if "user_id" in session:
+            user_details_row = db.execute("SELECT fullname, email, mobile, address FROM users WHERE id = ?", session["user_id"])
+            user_details["fullname"] = user_details_row[0]["fullname"]
+            user_details["email"] = user_details_row[0]["email"]
+            user_details["address"] = user_details_row[0]["address"]
+            user_details["mobile"] = user_details_row[0]["mobile"]
+        return render_template("cart.html", cart_items = cart_items, count = len(cart_items), grand_total = grand_total, user_details = user_details)
     return render_template("cart.html")
 
 @app.route("/get_times", methods=["GET"])
@@ -127,13 +167,13 @@ def pay():
     if len(delivery_slot_row) == 0:
         return jsonify({"message": "select another slot"})
 
-    if 'user' in session:
+    if 'user_id' in session:
         user_id = session['user_id']
 
         get_username_query = db.execute("SELECT username FROM users WHERE id = ?", user_id)
         name = get_username_query[0]["username"]
 
-        get_user_customer_id = db.execute("SELECT id FROM customers WHERE user_id = ?", user_id)
+        get_user_customer_id = db.execute("SELECT id FROM customers WHERE customer_user_id = ?", user_id)
         if len(get_user_customer_id) != 0:
             customer_id = get_user_customer_id[0]["id"]
 
@@ -145,14 +185,15 @@ def pay():
         for item in cart_items:
             grand_total = grand_total + float(item["subtotal"])
 
-    insert_transaction_query = db.execute("INSERT INTO transactions(total, customer_id, delivery_slot_id, delivery_type, address) VALUES(?, ?, ?, ?, ?, ?)", grand_total, customer_id, delivery_slot_row[0]["id"], method, address)
+    insert_transaction_query = db.execute("INSERT INTO transactions(total, customer_id, delivery_date, delivery_time, delivery_type, address) VALUES(?, ?, ?, ?, ?, ?)", grand_total, customer_id, delivery_slot_row[0]["date"], delivery_slot_row[0]["time"], method, address)
 
     for item in cart_items:
         insert_transaction_details_query = db.execute("INSERT INTO transaction_details(transaction_id, product_id, quantity, subtotal) VALUES(?, ?, ?, ?)", insert_transaction_query, item['id'], item['quantity'], item['subtotal'])
 
     delete_delivery_slot = db.execute("DELETE FROM delivery_slots WHERE id = ?", delivery_slot_row[0]["id"])
-     
-    return jsonify({"message": "Thank you for your order!"})
+    cart_items.clear()
+    messages = "Thank you for your order!"
+    return jsonify({"message": messages})
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -174,7 +215,7 @@ def register():
 
         pwd = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
 
-        insertQuery = "INSERT INTO users(username, hash) VALUES('" + request.form.get("username") + "', '" + pwd + "') "
+        insertQuery = "INSERT INTO users(username, hash, fullname, email, mobile) VALUES('" + request.form.get("username") + "', '" + pwd + "', '"+ request.form.get("fullname") +"', '"+ request.form.get("email") +"', '"+ request.form.get("mobile") +"') "
         db.execute(insertQuery)
 
         return redirect("/login")
@@ -208,6 +249,7 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
+        session["username"] = rows[0]["username"]
 
         # Redirect user to home page
         return redirect("/")

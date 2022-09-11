@@ -26,8 +26,19 @@ Cart
   </div>
 </div>
 
+
+{% if messages %}
+<div class="container">
+    <div class="row">
+
+      <p>{{messages}}</p>
+
+</div>
+{% endif %}
+
+
 {% if cart_items %}
-<div class="container" style="background-color: indianred; padding-bottom: 10px;">
+<div id="cart_container" class="container" style="background-color: indianred; padding-bottom: 10px;">
     <p><span class="h2">Shopping Cart </span><span class="h4">({{count}} item in your cart)</span></p>
   {% for item in cart_items %}
     <div class="card mb-4">
@@ -121,7 +132,7 @@ Cart
         <label>Address</label>
       </div>
       <div class="col-md-5 d-flex justify-content-center">
-            <input type="text" id="address" placeholder="delivery address" style="width: -webkit-fill-available;" class="input-general" required>
+            <input type="text" id="address" placeholder="delivery address" style="width: -webkit-fill-available;" class="input-general" required value="{{user_details.address}}">
 			</div>
 
         </div> <!-- END OF ROW -->
@@ -130,19 +141,19 @@ Cart
               <label>Name</label>
             </div>
             <div class="col-md-3 d-flex justify-content-center">
-              <input type="text" id="guest_name" placeholder="name" style="width: -webkit-fill-available;" class="input-general" required>
+              <input type="text" id="guest_name" placeholder="name" style="width: -webkit-fill-available;" class="input-general" required value="{{user_details.fullname}}">
             </div>
             <div class="col-md-1 d-flex justify-content-center">
               <label>Mobile</label>
             </div>
           <div class="col-md-3 d-flex justify-content-center">
-            <input type="text" id="guest_phone" placeholder="mobile" style="width: -webkit-fill-available;" class="input-general" required>
+            <input type="text" id="guest_phone" placeholder="mobile" style="width: -webkit-fill-available;" class="input-general" required value="{{user_details.mobile}}">
           </div>
           <div class="col-md-1 d-flex justify-content-center">
             <label>Email</label>
           </div>
           <div class="col-md-3 d-flex justify-content-center">
-            <input type="email" id="guest_email" placeholder="email" style="width: -webkit-fill-available;" class="input-general" pattern=".+@globex\.com" size="30" required>
+            <input type="email" id="guest_email" placeholder="email" style="width: -webkit-fill-available;" class="input-general" pattern=".+@globex\.com" size="30" required value="{{user_details.email}}">
           </div>
         </div>
     </div> <!-- END OF CARD BODY -->
@@ -179,17 +190,27 @@ Cart
   </div> <!-- END OF CARD BODY -->
 </div> <!-- END OF CARD -->
 
+
+
+    {% if session["user_id"] %}
     <div class="d-flex justify-content-end">
       <a type="button" class="btn btn-light btn-lg me-2" href="/">Continue shopping</a>
-      <a type="button" class="btn btn-primary btn-lg" onclick="checkout()">Checkout as guest</a>
-      <a type="button" class="btn btn-primary btn-lg" href="/login">Login</a>
+      <a type="button" class="btn btn-primary btn-lg me-2" onclick="checkout()">Checkout</a>
+    </div> 
+
+    {% else %}
+    <div class="d-flex justify-content-end">
+      <a type="button" class="btn btn-light btn-lg me-2" href="/">Continue shopping</a>
+      <a type="button" class="btn btn-primary btn-lg me-2" onclick="checkout()">Checkout as guest</a>
+      <a type="button" class="btn btn-primary btn-lg me-2" href="/login">Login</a>
     </div>
+    {% endif %}
 
 </div> <!-- END OF CONTAINER FOR CART -->
 {% else %}
-  <p>
+  <h3 id="message_p">
       Your shopping cart is empty...
-  </p>
+  </h3>
 {% endif %}
 <script>
   window.onload = (event) => {

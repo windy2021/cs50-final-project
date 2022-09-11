@@ -131,10 +131,10 @@ function checkout(){
     var method = select_method_element.options[select_method_element.selectedIndex].text;
 
     var address = document.getElementById("address").value;
-    // if(address == ""){
-    //     alert("Address cannot be empty!");
-    //     return;
-    // }
+    if(address == ""){
+        alert("Address cannot be empty!");
+        return;
+    }
 
     $.post("/pay",
     {
@@ -143,12 +143,22 @@ function checkout(){
         method: method,
         address: address
     }
-    , function(response){
-        if (response.message){
-            alert(response.message);
+    , function(response, status){
+        if (response.message && status == 'success'){
+            const cart_container = document.getElementById("cart_container");
+            cart_container.innerHTML = '';
+            cart_container.style.backgroundColor = "transparent";
+
+            var p = document.createElement("h3");
+            p.innerHTML = response.message;
+            cart_container.appendChild(p);;
+
+            window.sessionStorage.removeItem("selected_products");
         }
     }
     );
+    
+
 }
 
 function get_current_date_string(){

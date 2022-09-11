@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Order History
+{% endblock %}
+
+{% block main %}
+
+
+
+<div class="container">
+    <div class="section">
+        
+    </div>
+    <div class="section">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order No</th>
+                    <th>Order Placed</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if transactions %}
+                {% for dt in transactions %}
+                <tr>
+                    <td>#####{{ dt.id}}</td>
+                    <td>{{ dt.datetime }}</td>
+                    <td>{{ dt.total | usd }}</td>
+                    <td>{{ dt.status }}</td>
+                </tr>
+                {% endfor %}
+
+                {% else %}
+                <tr>
+                    <td colspan="5">
+                        You have no order history...
+                    </td>
+                </tr>
+                {% endif %}
+                
+        </table>
+    </div>
+</div>
+{% endblock %}

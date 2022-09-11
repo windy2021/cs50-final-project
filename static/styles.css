@@ -56,7 +56,7 @@ table td {
 }
 
 tbody tr:nth-of-type(odd) {
-    background-color: rgb(179, 208, 255, 0.3)
+    background-color: rgba(5, 38, 91, 0.3)
 }
 
 .fit-pic {
