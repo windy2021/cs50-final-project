@@ -267,8 +267,14 @@ def logout():
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
-    if request.method == "POST":
-        admin_date = request.args.get("admin_date")
-        admin_time = request.args.get("admin_time")
-        db.execute("insert into delivery_slots(date, time) values(?, ?)", admin_date, admin_time)
+    if not request.form.get("admin_date"):
+        return apology("must provide date", 403)
+
+    if not request.form.get("admin_time"):
+        return apology("must provide time", 403)
+
+    if request.args.get("admin_date") and request.args.get("admin_time"):
+        db.execute("insert into delivery_slots(date, time) values(?, ?)", request.args.get("admin_date"), request.args.get("admin_time"))
+        jsonify(data = "added")
+        
     return render_template("admin.html")

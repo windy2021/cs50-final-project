@@ -5,13 +5,11 @@
 {% endblock %}
 
 {% block main %}
-<form action="/admin" method="post">
     <div class="mb-3">
-        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="admin_date" name="admin_date" placeholder="Date" type="text">
+        <input autofocus class="form-control mx-auto w-auto" id="admin_date" name="admin_date" placeholder="Date" type="date">
     </div>
     <div class="mb-3">
-        <input class="form-control mx-auto w-auto" id="admin_time" name="admin_time" placeholder="Time" type="text">
+        <input class="form-control mx-auto w-auto" id="admin_time" name="admin_date" placeholder="Time" type="time">
     </div>
-    <button class="btn btn-primary" type="submit">Add Slot</button>
-</form>
+    <button class="btn btn-primary" onclick="add_delivery_slot()">Add Slot</button>
 {% endblock %}

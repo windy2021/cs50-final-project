@@ -157,8 +157,17 @@ function checkout(){
         }
     }
     );
-    
+}
 
+function add_delivery_slot(){
+    var admin_date = document.getElementById("admin_date").value;
+    var admin_time = document.getElementById("admin_time").value;
+    $.getJSON("/test",
+    {
+        admin_date: admin_date,
+        admin_time: admin_time
+    }
+    , function(data){alert(data)});
 }
 
 function get_current_date_string(){
