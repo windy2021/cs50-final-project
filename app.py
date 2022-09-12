@@ -10,14 +10,11 @@ from flask import Flask, flash, redirect, render_template, request, session, url
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_fontawesome import FontAwesome
 
 from helpers import apology, login_required, usd
 
 # Configure application
 app = Flask(__name__)
-
-fa = FontAwesome(app)
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -267,3 +264,11 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if request.method == "POST":
+        admin_date = request.args.get("admin_date")
+        admin_time = request.args.get("admin_time")
+        db.execute("insert into delivery_slots(date, time) values(?, ?)", admin_date, admin_time)
+    return render_template("admin.html")

@@ -33,11 +33,14 @@
                     {% if session["user_id"] %}
                         <ul class="navbar-nav me-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/">Hello, {{session["username"]}}!</a></li>
+                            {% if session["username"] == "admin" %} 
+                            <li class="nav-item"><a class="nav-link" href="/admin">Admin</a></li>
+                            {% else %}
                             <li class="nav-item"><a class="nav-link" href="/history">Order History</a></li>
+                            {% endif %}
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
-
                     {% else %}
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
