@@ -4,6 +4,7 @@ from decimal import Decimal
 from email import message
 import json
 import os
+from unittest import result
 
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
@@ -278,3 +279,110 @@ def admin():
         jsonify(data = "added")
         
     return render_template("admin.html")
+
+@app.route("/buy", methods=["GET", "POST"])
+@login_required
+def buy():
+    """Buy shares of stock"""
+    if request.method == "POST":
+        if not request.form.get("symbol"):
+            return apology ("must provide symbol")
+
+        # result = lookup(request.form.get("symbol"))
+        result = []
+
+        if not result:
+            return apology("symbol not found")
+
+        if not request.form.get("shares").isnumeric():
+            return apology("not a number", 400)
+
+        if int(request.form.get("shares")) <= 0 or (int(request.form.get("shares"))) % 1 != 0:
+            return apology("negative or fractional", 400)
+
+        shares_to_buy = float(request.form.get("shares"))
+        query_current_cash = db.execute("SELECT cash from users where id = '" + str(session.get("user_id")) + "'")
+        current_cash = float(query_current_cash[0]["cash"])
+        stock_price = float(result["price"])
+
+        if ((shares_to_buy * stock_price) > current_cash):
+            return apology("you dont have enough cash")
+
+        query_insert_transaction_buy = "INSERT INTO transactions(transaction_type, stock_symbol, stock_price, share_amount, transaction_amount, user_id, transaction_date)" + " VALUES('BUY', '"+ request.form.get("symbol").upper() +"', '"+ str(stock_price) +"', '"+ request.form.get("shares") + "', '" + str(shares_to_buy * stock_price) + "', '"+ str(session.get("user_id")) + "', datetime('now', 'localtime'))"
+
+        if (db.execute(query_insert_transaction_buy) > 0):
+            query_update_cash = "UPDATE users SET cash = '" + str(current_cash - (shares_to_buy * stock_price))  + "' WHERE id = '" + str(session.get("user_id")) + "'"
+            db.execute(query_update_cash)
+
+            return redirect("/")
+
+    return render_template("buy.html")
+
+@app.route("/sell", methods=["GET", "POST"])
+@login_required
+def sell():
+    """Sell shares of stock"""
+    if request.method == "POST":
+        if not request.form.get("symbol"):
+            return apology("must provide symbol")
+        # result = lookup(request.form.get("symbol"))
+        result = []
+
+        if not result:
+            return apology("symbol not found")
+
+        if float(request.form.get("shares")) <= 0:
+            return apology("shares must be greater than 0")
+
+        stock_price = result["price"]
+        shares_to_sell = float(request.form.get("shares"))
+
+        shares_own = 0
+        str_buy = (db.execute("SELECT SUM(share_amount) AS buy FROM transactions WHERE transaction_type = 'BUY' AND user_id = '" +
+                    str(session.get("user_id")) + "'" + " AND stock_symbol = '" + result["symbol"] + "'"))[0]['buy']
+        if not str_buy:
+            str_buy = "0"
+        int_buy = int(str_buy)
+        str_sell = (db.execute("SELECT SUM(share_amount) AS sell FROM transactions WHERE transaction_type = 'SELL' AND user_id = '" +
+                    str(session.get("user_id")) + "'" + " AND stock_symbol = '" + result["symbol"] + "'"))[0]['sell']
+        if not str_sell:
+            str_sell = "0"
+        int_sell = int(str_sell)
+        shares_own = int_buy - int_sell
+        if shares_own < shares_to_sell:
+            return apology("you do not own that many shares of the stock")
+
+        query_current_cash = db.execute("SELECT cash from users where id = '" + str(session.get("user_id")) + "'")
+        current_cash = float(query_current_cash[0]["cash"])
+        query_insert_transaction_buy = "INSERT INTO transactions(transaction_type, stock_symbol, stock_price, share_amount, transaction_amount, user_id, transaction_date)" + " VALUES('SELL', '" + request.form.get(
+                                        "symbol").upper() +"', '" + str(stock_price) + "', '" + request.form.get("shares") + "', '" + str(shares_to_sell * stock_price) + "', '"+ str(session.get("user_id")) + "', datetime('now', 'localtime'))"
+
+        if (db.execute(query_insert_transaction_buy) > 0):
+            query_update_cash = "UPDATE users SET cash = '" + str(current_cash + (shares_to_sell * stock_price)) + "' WHERE id = '" + str(session.get("user_id")) + "'"
+            db.execute(query_update_cash)
+
+            return redirect("/")
+    data = get_all_stock()
+    return render_template("sell.html", data=data)
+
+
+def get_all_stock():
+    data = []
+    all_stocks_own = db.execute("SELECT DISTINCT stock_symbol FROM transactions WHERE user_id = '" + str(session.get("user_id")) + "'")
+    if all_stocks_own:
+        for row in all_stocks_own:
+            # result = lookup(row["stock_symbol"])
+            result =[]
+            stock_current_price = float(result["price"])
+            str_buy = (db.execute("SELECT SUM(share_amount) AS buy FROM transactions WHERE transaction_type = 'BUY' AND user_id = '" + str(session.get("user_id")) + "'" + " AND stock_symbol = '" + row["stock_symbol"] + "'"))[0]['buy']
+            if not str_buy:
+                str_buy = "0"
+            int_buy = int(str_buy)
+            str_sell = (db.execute("SELECT SUM(share_amount) AS sell FROM transactions WHERE transaction_type = 'SELL' AND user_id = '" + str(session.get("user_id")) + "'" + " AND stock_symbol = '" + row["stock_symbol"] + "'"))[0]['sell']
+            if not str_sell:
+                str_sell = "0"
+            int_sell = int(str_sell)
+            stock_info = {"stock_symbol": row["stock_symbol"], "stock_name": result["name"], "shares": str(int_buy - int_sell), "price": usd(stock_current_price), "total": usd((int_buy - int_sell) * stock_current_price)}
+            if int(stock_info["shares"]) > 0:
+                data.append(stock_info)
+    return data
