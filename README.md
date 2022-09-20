@@ -7,7 +7,7 @@ There are total of eight templates in this application.
 1. Index
 This page will show the menu of the shop. I am using bootstrap cards to show the individual item. 
 Each card has Title (name of the item), Description (the ingredients of the item), Price, Input type number, and an "Add" button.
-When customer click on the "Add" button on one of these cards, an AJAX call will be made to the server to SAVE the selected item in a global variable List on server side and in the SessionStorage on the client side (browser).
+When customer click on the "Add" button on one of these cards, selected item will be saved in SessionStorage.
 
 2. Cart
 This page will show the selected items along with all the information of the product, subtotal per product, and total of the order.
